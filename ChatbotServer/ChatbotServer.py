@@ -1,4 +1,5 @@
 import json
+import requests
 
 from flask import Flask, jsonify, request, make_response
 
@@ -18,8 +19,8 @@ flightData = FlightData()
 # --------------------------------------
 # Orchestrator 객체 생성
 # --------------------------------------
-orch = Orchestrator('tenant 입력', 'email or user 입력', 'password 입력')
-
+orch = Orchestrator('')
+ID = None # job ID
 
 # --------------------------------------
 # 응답처리
@@ -27,7 +28,7 @@ orch = Orchestrator('tenant 입력', 'email or user 입력', 'password 입력')
 def results():
     req = request.get_json(force=True)
     action = req.get('queryResult').get('action')
-    global flightData, orch
+    global flightData, orch, ID
     result = {}
 
     # --------------------------------------
@@ -60,15 +61,26 @@ def results():
         date1, date2 = flightData.get_date()
         startInfo = build_json_startjobs(location, date1, date2)
         response = orch.request('post', orch.startJobs, body=startInfo)
+        print(response)
         ID = response["value"][0]["Id"]
-        print(ID)
 
+        result["fulfillmentText"] = '항공권 조회중입니다. 잠시만 기다려주세요'
+
+    # --------------------------------------
+    # 항공권 목록
+    # --------------------------------------
+    if action == 'flight.flight-custom.flight-city-custom.flight-city-date-custom':
         response = orch.request('get', orch.Jobs + '(%s)' % ID)
-        while response['State'] == 'Pending' or response['State'] == 'Running':
-            response = orch.request('get', orch.Jobs + '(%s)' % ID)
+        if response['State'] == 'Pending' or response['State'] == 'Running':
+            result["fulfillmentText"] = '아직 조회 중입니다. 조금만 더 기다려 주시겠어요?'
 
-        result["fulfillmentText"] = location[0] + "에서 " + location[1] + "으로 " + startDate + " ~ " + \
-                                    endDate + "비행기 맞으신가요?"
+        if response['State'] == 'Successful':
+            response = json.loads(response["OutputArguments"])
+
+            departure_data = response["Departure_Data"]
+            arrival_data = response["Arrival_Data"]
+
+            result["fulfillmentText"] = '출국편 : ' + str(departure_data) + '귀국편 : ' + str(arrival_data)
 
     # jsonify the result dictionary
     # this will make the response mime type th application/json
@@ -76,6 +88,7 @@ def results():
 
     # return a result json
     return make_response(result)
+
 
 # --------------------------------------
 # startjobs 요청을 위한 json data 생성
@@ -93,7 +106,7 @@ def build_json_startjobs(location, date1, date2):
     }
     startInfo = {
         'startInfo': {
-            "ReleaseKey": "ea5a2a7b-ea33-44ce-8ed6-df86700ed7fe",
+            "ReleaseKey": "1c18060d-7df3-4f80-8fe3-9ba0ea141faf",
             "Strategy": "Specific",
             "RobotIds": [
                 138009

@@ -1,27 +1,13 @@
-from flask import g, Flask, request
+from orchestrator import Orchestrator
+import json
 
-app = Flask(__name__)
+orch = Orchestrator('')
 
-def after_this_request(f):
-    if not hasattr(g, 'after_request_callbacks'):
-        g.after_request_callbacks = []
-    g.after_request_callbacks.append(f)
-    return f
+response = orch.request('get', orch.Jobs + '(7475429)')
 
+print(response)
+response = json.loads(response["OutputArguments"])
+print(response)
 
-@app.after_request
-def call_after_request_callbacks(response):
-    for callback in getattr(g, 'after_request_callbacks', ()):
-        response = callback(response)
-
-    return response
-
-@app.before_request
-def detect_user_language():
-    language = request.cookies.get('user_lang')
-    if language is None :
-        language = guess_language_from_request()
-        @after_this_request
-        def remember_language(response):
-            response.set_cookie('user_lang', language)
-    g.language = language
+departure_data = response["Departure_Data"]
+arrival_data = response["Arrival_Data"]

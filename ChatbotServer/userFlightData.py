@@ -17,13 +17,13 @@ class FlightData:
         self.finish = finish
 
     def set_date(self, startDate, endDate):
-        self.y1 = startDate[0:4]
-        self.m1 = startDate[5:7]
-        self.d1 = startDate[8:10]
+        self.y1 = str(int(startDate[0:4]))
+        self.m1 = str(int(startDate[5:7]))
+        self.d1 = str(int(startDate[8:10]))
 
-        self.y2 = endDate[0:4]
-        self.m2 = endDate[5:7]
-        self.d2 = endDate[8:10]
+        self.y2 = str(int(endDate[0:4]))
+        self.m2 = str(int(endDate[5:7]))
+        self.d2 = str(int(endDate[8:10]))
 
     def get_location(self):
         return self.start, self.finish

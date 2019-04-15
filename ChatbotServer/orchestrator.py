@@ -3,6 +3,8 @@ import requests
 
 class Orchestrator:
     token = None
+    startJobs = ''
+    Jobs = ''
 
     def __init__(self, tenant, user, password, url='https://platform.uipath.com/'):
         self.url = url
