@@ -19,7 +19,7 @@ flightData = FlightData()
 # --------------------------------------
 # Orchestrator 객체 생성
 # --------------------------------------
-orch = Orchestrator('')
+orch = Orchestrator('', '', '')
 ID = None # job ID
 
 # --------------------------------------
@@ -41,7 +41,7 @@ def results():
     # --------------------------------------
     # 출발지, 도착지 정보 처리
     # --------------------------------------
-    if action == 'flight.flight-custom':
+    if action == 'flight.cityInfo':
         param = req.get('queryResult').get('parameters')
         start = param["source"][0]
         finish = param["destination"][0]
@@ -51,7 +51,7 @@ def results():
     # --------------------------------------
     # 시간정보 처리
     # --------------------------------------
-    if action == 'flight.flight-custom.flight-city-custom':
+    if action == 'flight.dateInfo':
         param = req.get('queryResult').get('parameters')
         startDate = param["startDate"]
         endDate = param["endDate"][0]
@@ -69,7 +69,7 @@ def results():
     # --------------------------------------
     # 항공권 목록
     # --------------------------------------
-    if action == 'flight.flight-custom.flight-city-custom.flight-city-date-custom':
+    if action == 'flight.searching':
         response = orch.request('get', orch.Jobs + '(%s)' % ID)
         if response['State'] == 'Pending' or response['State'] == 'Running':
             result["fulfillmentText"] = '아직 조회 중입니다. 조금만 더 기다려 주시겠어요?'
@@ -80,7 +80,15 @@ def results():
             departure_data = response["Departure_Data"]
             arrival_data = response["Arrival_Data"]
 
-            result["fulfillmentText"] = '출국편 : ' + str(departure_data) + '귀국편 : ' + str(arrival_data)
+            location = flightData.get_location()
+            result_string = location[0] + '->' + location[1] + '\n'
+            for data in departure_data:
+                result_string = result_string + data + '\n'
+            result_string = result_string + location[1] + '->' + location[0] + '\n'
+            for data in arrival_data:
+                result_string = result_string + data + '\n'
+
+            result["fulfillmentText"] = result_string
 
     # jsonify the result dictionary
     # this will make the response mime type th application/json
