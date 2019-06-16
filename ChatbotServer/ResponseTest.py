@@ -1,13 +1,10 @@
 from orchestrator import Orchestrator
 import json
+import requests
 
-orch = Orchestrator('')
 
-response = orch.request('get', orch.Jobs + '(7475429)')
-
+headers = {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': 'Bearer b7OgFVWb55coUDTXYuSd3fRa3XuEMVvG54u3hIE4xdG'
+        }
 print(response)
-response = json.loads(response["OutputArguments"])
-print(response)
-
-departure_data = response["Departure_Data"]
-arrival_data = response["Arrival_Data"]

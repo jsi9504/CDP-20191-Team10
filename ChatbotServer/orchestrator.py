@@ -18,7 +18,7 @@ class Orchestrator:
                            {'tenancyName': tenant,
                             'usernameOrEmailAddress': user,
                             'password': password})
-
+        print(res)
         return res["result"]
 
 
