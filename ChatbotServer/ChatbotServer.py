@@ -19,7 +19,7 @@ flightData = FlightData()
 # --------------------------------------
 # Orchestrator, RPAresponse 생성
 # --------------------------------------
-orch = Orchestrator('jsi9504', 'tnsdlr10000@gmail.com', 'qlalfqjsgh!1')
+orch = Orchestrator('tenant', 'email', 'password')
 RPAres = RPAresponse.RPAresponse(orch)
 
 # --------------------------------------
